@@ -3,13 +3,15 @@
 
 // I am bored.
 
-use utils::system_commands::{check_os, run_command};
+use utils::system_commands::check_os;
 
 mod utils;
 mod logger;
+mod cli;
 
 fn main() {
    check_os();
 
-   run_command("emerge", vec!["--pretend", "net-im/discord"]);
+   // What a barren main function
+   cli::parser::parse();
 }
