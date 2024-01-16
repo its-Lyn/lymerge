@@ -7,6 +7,22 @@ use super::arguments::create_arguments;
 pub fn parse() {
     let command_matches = create_arguments().get_matches();
 
+    if command_matches.get_flag("version") {
+        println!("lymerge 0.6.2");
+        run_command("emerge", vec!["--version"]);
+
+        println!(r"
+                 ♡ ∩ ∩
+                 („•֊•„)♡             ♡
+                |￣U U￣￣￣￣￣￣￣￣|
+                |  Have a good day..  |
+                |                     |
+                 ￣￣￣￣￣￣￣￣￣￣♡
+        ");
+
+        std::process::exit(0);
+    }
+
     match command_matches.subcommand() {
         Some(("install", sub_matches)) => {
             ensure_root();
