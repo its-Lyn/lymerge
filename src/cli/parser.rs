@@ -15,9 +15,14 @@ pub fn parse() {
                 "--ask", 
                 "--verbose", 
                 "--keep-going",
-                "--getbinpkg",
-                sub_matches.get_one::<String>("PACKAGE").expect(log_string(LogLevel::Error, "Please make sure to provide the package.").as_str())
+                "--getbinpkg"
             ];
+
+            let packages: Vec<_> = sub_matches.get_many::<String>("PACKAGE").expect("weh :c").collect();
+            for package in packages.iter() {
+                emerge_arguments.push(package);
+            }
+
 
             if sub_matches.get_flag("nobin") {
                 emerge_arguments.remove(3);
@@ -44,6 +49,23 @@ pub fn parse() {
             run_command(
                 "emerge", 
                 upgrade_arguments
+            )
+        },
+
+        Some(("search", ser_matches)) => {
+            let packages: Vec<_> = ser_matches.get_many::<String>("SEARCH").expect(log_string(LogLevel::Error, "Please make sure to provide the package.").as_str()).collect();
+       
+            let mut search_arguments = vec![
+                "--search"
+            ];
+
+            for package in packages.iter() {
+                search_arguments.push(package);
+            }
+
+            run_command(
+                "emerge",
+                search_arguments
             )
         },
 

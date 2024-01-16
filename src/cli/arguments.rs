@@ -11,7 +11,7 @@ pub fn create_arguments() -> Command {
             Command::new("install")
                 .about("Download and install a package.")
                 .arg(
-                    arg!(<PACKAGE> "The package to install.")
+                    arg!(<PACKAGE> "The package to install.").num_args(0..) 
                 )
                 .arg(
                     Arg::new("nobin")
@@ -37,6 +37,13 @@ pub fn create_arguments() -> Command {
                         .long("nobin")
                         .help("Tell emerge not to pull from your binhost.")
                         .action(ArgAction::SetTrue)
+                )
+        )
+        .subcommand(
+            Command::new("search")
+                .about("Search for packages")
+                .arg(
+                    arg!(<SEARCH> "The packages to search for.").num_args(0..)
                 )
         )
 }
