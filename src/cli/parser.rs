@@ -34,7 +34,7 @@ pub fn parse() {
                 "--getbinpkg"
             ];
 
-            let packages =  sub_matches.get_many::<String>("PACKAGE");
+            let packages =  sub_matches.get_many::<String>("PACKAGES");
             match packages {
                 Some(packages) => {
                     for package in packages {

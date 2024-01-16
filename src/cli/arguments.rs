@@ -20,7 +20,7 @@ pub fn create_arguments() -> Command {
             Command::new("install")
                 .about("Download and install packages.")
                 .arg(
-                    arg!(<PACKAGE> "The package to install.").num_args(0..) 
+                    arg!(<PACKAGES> "The package to install.").num_args(0..) 
                 )
                 .arg(
                     Arg::new("nobin")

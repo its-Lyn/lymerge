@@ -15,7 +15,7 @@ pub fn check_os() {
 
 pub fn ensure_root() {
     if sudo::check() == RunningAs::User {
-        log_stdout(LogLevel::Warning, "Lymerge needs to be run as root, elevating.", true);
+        log_stdout(LogLevel::Warning, "Lymerge needs to be ran as root, elevating.", true);
         
         if let Err(_) = sudo::escalate_if_needed() {
             log_stdout(LogLevel::Error, "Failed to escalate, aborting.", true);
