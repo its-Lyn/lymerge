@@ -9,7 +9,7 @@ pub fn create_arguments() -> Command {
         .arg_required_else_help(true)
         .subcommand(
             Command::new("install")
-                .about("Download and install a package.")
+                .about("Download and install packages.")
                 .arg(
                     arg!(<PACKAGE> "The package to install.").num_args(0..) 
                 )
@@ -44,6 +44,17 @@ pub fn create_arguments() -> Command {
                 .about("Search for packages")
                 .arg(
                     arg!(<SEARCH> "The packages to search for.").num_args(0..)
+                )
+        )
+        .subcommand(
+            Command::new("info")
+                .about("Show portage info.")
+        )
+        .subcommand(
+            Command::new("uninstall")
+                .about("Remove packages from your system.")
+                .arg(
+                    arg!(<PACKAGES> "The packages to uninstall.").num_args(0..)
                 )
         )
 }
