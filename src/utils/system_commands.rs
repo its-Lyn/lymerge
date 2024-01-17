@@ -19,6 +19,7 @@ pub fn ensure_root() {
         
         if let Err(_) = sudo::escalate_if_needed() {
             log_stdout(LogLevel::Error, "Failed to escalate, aborting.", true);
+            std::process::exit(1);
         }
     }
 }
