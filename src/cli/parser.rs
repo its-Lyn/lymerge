@@ -1,11 +1,27 @@
 use crate::utils::system_commands::{run_command, ensure_root};
-use crate::logger::logger::log_string;
+use crate::logger::logger::log_stdout;
 use crate::logger::log_level::LogLevel;
 
 use super::arguments::create_arguments;
 
 pub fn parse() {
     let command_matches = create_arguments().get_matches();
+
+    if command_matches.get_flag("version") {
+        println!("lymerge 0.6.2");
+        run_command("emerge", vec!["--version"]);
+
+        println!(r"
+                 ♡ ∩ ∩
+                 („•֊•„)♡             ♡
+                |￣U U￣￣￣￣￣￣￣￣|
+                |  Have a good day..  |
+                |                     |
+                 ￣￣￣￣￣￣￣￣￣￣♡
+        ");
+
+        std::process::exit(0);
+    }
 
     match command_matches.subcommand() {
         Some(("install", sub_matches)) => {
@@ -18,9 +34,18 @@ pub fn parse() {
                 "--getbinpkg"
             ];
 
-            let packages: Vec<_> = sub_matches.get_many::<String>("PACKAGE").expect("weh :c").collect();
-            for package in packages.iter() {
-                emerge_arguments.push(package);
+            let packages =  sub_matches.get_many::<String>("PACKAGES");
+            match packages {
+                Some(packages) => {
+                    for package in packages {
+                        emerge_arguments.push(package);
+                    }
+                },
+
+                None => {
+                    log_stdout(LogLevel::Error, "Please make sure to provide the package(s).", true);
+                    std::process::exit(1);
+                }
             }
 
 
@@ -53,20 +78,59 @@ pub fn parse() {
         },
 
         Some(("search", ser_matches)) => {
-            let packages: Vec<_> = ser_matches.get_many::<String>("SEARCH").expect(log_string(LogLevel::Error, "Please make sure to provide the package.").as_str()).collect();
-       
             let mut search_arguments = vec![
                 "--search"
             ];
 
-            for package in packages.iter() {
-                search_arguments.push(package);
+            let packages = ser_matches.get_many::<String>("SEARCH");
+            match packages {
+                Some(packages) => {
+                    for package in packages {
+                        search_arguments.push(package);
+                    }
+                },
+
+                None => {
+                    log_stdout(LogLevel::Error, "Please make sure to provide the package(s).", true);
+                    std::process::exit(1);
+                }
             }
 
             run_command(
                 "emerge",
                 search_arguments
             )
+        },
+
+        Some(("uninstall", uns_matches)) => {
+            ensure_root();
+
+            let mut uninstall_arguments = vec![
+                "--ask",
+                "--deselect"
+            ];
+
+            let packages = uns_matches.get_many::<String>("PACKAGES");
+            match packages {
+                Some(packages) => {
+                    for package in packages {
+                        uninstall_arguments.push(package);
+                    }
+                },
+                
+                None => {
+                    log_stdout(LogLevel::Error, "Please make sure to provide the package(s).", true);
+                    std::process::exit(1);
+                }
+            }  
+
+            // Deselect, then depclean, makes it safer.
+            run_command("emerge", uninstall_arguments);
+            run_command("emerge", vec!["--ask", "--depclean"]);
+        },
+
+        Some(("info", _)) => {
+            run_command("emerge", vec!["--info"])
         },
 
         _ => unreachable!(),

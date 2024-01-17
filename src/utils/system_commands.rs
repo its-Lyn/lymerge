@@ -1,12 +1,10 @@
 use std::process;
 use std::path::Path;
-use std::process::{Command, Stdio};
+use std::process::Command;
 use sudo::RunningAs;
 
-use std::io::Write;
-
 use crate::logger::log_level::LogLevel;
-use crate::logger::logger::{log_stdout, log_string};
+use crate::logger::logger::log_stdout;
 
 pub fn check_os() {
     if !cfg!(unix) || !Path::new("/etc/gentoo-release").exists() {
@@ -17,19 +15,22 @@ pub fn check_os() {
 
 pub fn ensure_root() {
     if sudo::check() == RunningAs::User {
-        log_stdout(LogLevel::Warning, "Lymerge needs to be run as root, elevating.", true);
-        sudo::escalate_if_needed().expect(log_string(LogLevel::Error, "Failed to escalate to root.").as_str());
+        log_stdout(LogLevel::Warning, "Lymerge needs to be ran as root, elevating.", true);
+        
+        if let Err(_) = sudo::escalate_if_needed() {
+            log_stdout(LogLevel::Error, "Failed to escalate, aborting.", true);
+            std::process::exit(1);
+        }
     }
 }
 
-pub fn run_command(name: &str, args: Vec<&str>) {
-    std::io::stdout().flush().expect("Failed to flush stdout.");
-
-    Command::new(name)
-        .stdin(Stdio::inherit())
-        .stdout(Stdio::inherit())
-        .stderr(Stdio::inherit())
+pub fn run_command(name: &str, args: Vec<&str>) { 
+    let cmd = Command::new(name)
         .args(args)
-        .status()
-        .expect(log_string(LogLevel::Error, "Failed to run command.").as_str());
+        .status();
+
+    if let Err(e) = cmd {
+        log_stdout(LogLevel::Error, format!("Command failed to execute: {}, exitting.", e).as_str(), true);
+        std::process::exit(1);
+    }
 }

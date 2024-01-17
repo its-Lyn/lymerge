@@ -3,13 +3,6 @@ use super::log_level::LogLevel;
 use std::io;
 use std::io::Write;
 
-pub fn log_string(
-    log_level: LogLevel,
-    message: &str
-) -> String {
-    return format!("{}: {}", log_level, message);
-}
-
 pub fn log_stdout(
     log_level: LogLevel,
     message: &str,
